@@ -31,7 +31,7 @@ type Signer interface{
 	// Configure
 	key := [32]byte{ /* random data */ }
 	ttl := 5*time.Second
-	s, _ := signer.New(branca.Config, key[:], )
+	s, _ := signer.New(branca.Config, key[:], ttl)
 
 	// Sign
 	tok, _ := s.Sign([]byte("hello world"))
