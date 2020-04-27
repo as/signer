@@ -39,12 +39,12 @@ func TestBasicSignVerify(t *testing.T) {
 }
 
 func TestWellKnownVector(t *testing.T) {
-	z := struct{
-		t time.Time
-		n [24]byte
-		k [32]byte
-		input [128]byte
-		want string
+	z := struct {
+		t       time.Time
+		n       [24]byte
+		k       [32]byte
+		input   [128]byte
+		want    string
 		wantBin string
 	}{}
 	want := `uohuCQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB4npaJ5SCNf9nh88W1NB9I7xihPkGJmK3a3ZejaTqYf46C7NXBQzv-0a9JdQwPH_KcQXSgWxGao6noMzgS4MD-pJ4e4BNKcKnUnCTgy9j8O6J-l8MyKtSH93j43GoSL6WcvjPneOouULtZCcmXHE_sL5NSP3eJLRfKpYFn3sTWx6qOWWXHu_0PFvjVMBcljBA`
@@ -53,13 +53,13 @@ func TestWellKnownVector(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	tok:= s.SignAt(z.t,z.n[:], z.input[:])
+	tok := s.SignAt(z.t, z.n[:], z.input[:])
 	have := string([]byte(tok))
-	if have != wantBin{
+	if have != wantBin {
 		t.Fatalf("binary encoding: have %q, want %q", have, wantBin)
 	}
 	have = tok.String()
-	if have != want{
+	if have != want {
 		t.Fatalf("string encoding: have %q, want %q", have, want)
 	}
 
@@ -71,9 +71,26 @@ func TestWellKnownVector(t *testing.T) {
 	}
 }
 
+func TestWellKnownBrancaVector(t *testing.T) {
+	tm := time.Time{}
+	// input := "Hello world!"
+	s, err := signer.New(branca.Config, []byte("supersecretkeyyoushouldnotcommit"), 0)
+	if err != nil {
+		panic(err)
+	}
+	p, err := s.VerifyAt(tm, []byte(branca_hello_world))
+	ck(t, "verify", err)
+	t.Log(p)
+}
+
 func ck(t *testing.T, ctx string, err error) {
 	t.Helper()
 	if err != nil {
 		t.Fatalf(ctx, err)
 	}
 }
+
+// https://github.com/tuupola/branca-js/blob/9d4eee0d73d621deb763f55189ad18544870cd64/test.js#L8-L15
+// supersecretkeyyoushouldnotcommit
+// Hello world!
+var branca_hello_world = "\xba\x00\x00\x00\x00[*\xddB_\xb6&(\x1cIZo\xa8\x83\x1f\xc9\xf0\xcf@2\x87@u\x1a\x009\x8f\x83\xef\xb3q\xd6Q@\xfa\x04\x90u\x9a\xe4pA\xf4\x11:Sd\xc7i\x1a\xf9\xb2"
