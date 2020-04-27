@@ -1,6 +1,6 @@
 # Signer
 
-This is just a simple token scheme based on chacha20poly1305. It has a binary format
+This is just a simple token scheme based on xchacha20poly1305. It has a binary format
 similar to "baranca". 
 
 Only difference is it uses base64 encoding instead of base62* for the Token type. The
