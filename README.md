@@ -33,7 +33,7 @@ servers that issue tokens, perhaps for sessions or other data.
 ```
 type Signer interface{
 	// Sign creates a token using the msg and nonce, if nonce is nil
-	// one is generated automatically.
+	// one is generated automatically using a CSPRNG (crypto/rand.Read)
 	Sign(msg []byte, nonce []byte) (Token, error)
 	
 	// Verify authenticates the token and returns the decrypted msg
