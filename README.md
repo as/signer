@@ -2,7 +2,7 @@
 
 Signer is a simple token scheme based on xchacha20poly1305 to generate authenticatable *and encrypted* 
 tokens issued to parties. Signer's wire format similar to "branca", except it utilizes url-safe base64
-and omits branca's awkward 32-bit binary time field.
+and omits branca's 32-bit binary time field.
 
 The Token type is a byte slice implementing base64 MarshalText and UnmarshalText.
 
@@ -15,9 +15,12 @@ inside the token private, and only accessible by the server or other parties in 
 the key. The authentication is symmetric. Only servers in possesion of the key can verify the
 token's authenticity.
 
-You should not use this if you want the client to be able to read and authenticate the data stored
-in the token. E.G., asymmetric authentication with RSA or an elliptic curve. This token is for
-servers that issue tokens, perhaps for sessions or other data.
+You should not use Signer the client (not the server) needs to read and/or authenticate the token
+E.G., asymmetric authentication with RSA or an elliptic curve. This token is for servers that issue
+tokens, perhaps for sessions or other data.
+
+For example: If you are using JWT with HMAC (and/or encryption), you can replace it with signer. 
+If you are using JWT with RSA/EC, you can not.
 
 # Wire Format
 
@@ -87,7 +90,7 @@ JWT spec is complex and bloated. Signer is a bare-bones token that provides auth
 
 You want the client to be able to validate the contents of the token, using the servers public key. Signer does not support this usecase at the time of writing. However, it may be feasible to support this in another version if there is pressing need.
 
-You don't want the contents of the token to be encrypted. Typically, encryption and authentication are erroneously confused for each other. Signer authenticates and encrypts the ciphertext. If you don't want encryption but want authentication, it might be good to consider other schemes (but this is not likely). In the case of tokens, you usually want the ability to verify the token. Keep in mind that a client who has a plaintext authenticated token has no way to verify its integrity unless they use asymmetric scheme such as RSA or Elliptic Curve, but these are orders of magnitude slower that symmetric encryption, so the performance benefit of dropping encryption and using only authentication in your scheme is lost. This might be a good usecase for a third version of signer that puts the entire token's content into the unencrypted part of the AEAD if there is pressing need. At this time, the idea of this usecase is extremely unlikely.
+You don't want the contents of the token to be encrypted. Typically, encryption and authentication are erroneously confused for each other. Signer authenticates and encrypts the ciphertext. If you don't want encryption but want authentication, it might be good to consider other schemes (but this is not likely). In the case of tokens, you usually want the ability to verify the token. Keep in mind that a client who has a plaintext authenticated token has no way to verify its integrity unless they use asymmetric scheme such as RSA or Elliptic Curve, but these are orders of magnitude slower that symmetric encryption, so the performance benefit of dropping encryption and using only authentication in your scheme is lost. This might be a good usecase for a third version of signer that puts the entire token's content into the unencrypted part of the AEAD if there is pressing need. At this time, the idea of this usecase is unlikely.
 
 # Base64 Encoding
 
