@@ -61,9 +61,13 @@ type Signer interface{
 # Notes
 
 ## Why not use branca?
-Branca has a 32-bit unsigned binary time field and isn't future-proof. Having time in the specification is a scope creep. You can add your own time field in the message and have full control over how to use it. Most branca implementations don't return the message if the message is authentic, but expired. This is rather useless in practical deployments! We want the ability to log authentic but expired tokens to debug misbehaving clients or bugs in clients software.
+Branca's uint32 time field isn't future-proof and ignorant of time predating 1970 (time is a signed value). Time in a token specification is scope creep. Add your own time in the msg to excersize full control, since its guaranteed to be authenitc. 
 
-Branca uses base62. There are many opinions of what base62 actually is (branca test vectors could not be decoded by online base62 decoders.). We prefer a standard encoding in a binary power of 2 that is easily accessible across languages.
+Branca implementations don't return msg if it is authentic but expired, which is useless for practical deployments. With Signer, you have the ability to log authentic but expired tokens to debug misbehaving clients or bugs in clients software.
+
+Branca uses base62, which is a clumsy, poorly-defined standard (branca test vectors could not be decoded by online base62 decoders). Prefer a standard encoding in a binary power of 2 that is easily accessible across languages.
+
+Branca does not offer easily-available test vectors. Java implementations in the wild incorrectly implement AEADs that only authenticate the header and not the cipher text. We provide an interface that allows the user to pass in the nonce because in practice this is CRITICAL to reproducibly verifying test vectors in the implementation.
 
 ## Why not use JWT?
 
@@ -74,4 +78,15 @@ JWT spec is complex and bloated. Signer is a bare-bones token that provides auth
 ## Why not use Signer?
 
 You want the client to be able to validate the contents of the token, using the servers public key. Signer does not support this usecase at the time of writing. However, it may be feasible to support this in another version if there is pressing need.
+
+# Test Vectors
+
+This is the output of the zero vector, composed of a 32-byte key and nonce of all zero bits in binary and base64 url-safe format for your implementation in other languages:
+
+		name:  "zero",
+		input: "",
+		key:   [32]byte{},
+		nonce: [24]byte{},
+		binary: "A\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\b\xac\x81ƕ\xb5;\xefw\n\xde5PU\xde",
+		text:   "QQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAisgcaVtc2-73cK3jVQVd4",
 
