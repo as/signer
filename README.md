@@ -2,7 +2,7 @@
 
 Signer is a simple token scheme based on xchacha20poly1305 to generate authenticatable *and encrypted* 
 tokens issued to parties. Signer's wire format similar to "branca", except it utilizes url-safe base64
-omits the 32-bit binary time field.
+and omits branca's awkward 32-bit binary time field.
 
 The Token type is a byte slice implementing base64 MarshalText and UnmarshalText.
 
