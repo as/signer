@@ -17,7 +17,7 @@ the key. Only the server can verify the authenticity of the key (the authenticat
 
 You should not use this if you want the client to be able to read and authenticate the data stored
 in the token. E.G., asymmetric authentication with RSA or an elliptic curve. This token is for
-servers that issues tokens, perhaps for sessions or other data.
+servers that issue tokens, perhaps for sessions or other data.
 
 # Wire Format
 ```
