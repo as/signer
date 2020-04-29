@@ -89,6 +89,12 @@ You want the client to be able to validate the contents of the token, using the 
 
 You don't want the contents of the token to be encrypted. Typically, encryption and authentication are erroneously confused for each other. Signer authenticates and encrypts the ciphertext. If you don't want encryption but want authentication, it might be good to consider other schemes (but this is not likely). In the case of tokens, you usually want the ability to verify the token. Keep in mind that a client who has a plaintext authenticated token has no way to verify its integrity unless they use asymmetric scheme such as RSA or Elliptic Curve, but these are orders of magnitude slower that symmetric encryption, so the performance benefit of dropping encryption and using only authentication in your scheme is lost. This might be a good usecase for a third version of signer that puts the entire token's content into the unencrypted part of the AEAD if there is pressing need. At this time, the idea of this usecase is extremely unlikely.
 
+# Base64 Encoding
+
+The Token type uses URL-safe base64-encoding without padding characters. Below is the well-known character-set that comprises base64 url-safe encoding:
+
+`ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_`
+
 # Test Vectors
 
 This is the output of the zero vector, composed of a 32-byte key and nonce of all zero bits in binary and base64 url-safe format for your implementation in other languages:
