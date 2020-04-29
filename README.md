@@ -29,7 +29,7 @@ servers that issues tokens, perhaps for sessions or other data.
 	The rest is the output of the AEAD, the ciphertext and 16 byte tag. 
 ```
 
-# Interface (callee defined)
+# Interface (caller defined)
 ```
 type Signer interface{
 	// Sign creates a token using the msg and nonce, if nonce is nil
