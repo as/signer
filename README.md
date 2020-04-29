@@ -1,11 +1,10 @@
 # Signer
 
-Signer is a simple token scheme based on xchacha20poly1305. It is used to generate
-authenticated *and encrypted* tokens which can be issued to clients. It has a binary
-format similar to "branca", except it has no 32-bit binary time field, and uses base64
-url-safe encoding (instead of base62).
+Signer is a simple token scheme based on xchacha20poly1305 to generate authenticatable *and encrypted* 
+tokens issued to parties. Signer's wire format similar to "branca", except it utilizes url-safe base64
+omits the 32-bit binary time field.
 
-Token is just a byte slice that implements MarshalText and UnmarshalText in base64.
+The Token type is a byte slice implementing base64 MarshalText and UnmarshalText.
 
 # Use Case
 
