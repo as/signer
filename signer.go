@@ -20,6 +20,7 @@ var (
 	ErrShort  = errors.New("message too short")
 )
 
+// New returns a Signer configured with key, if and only if len(key) == 32
 func New(key []byte) (*Signer, error) {
 	aead, err := chacha20poly1305.NewX(key)
 	if err != nil {
@@ -28,6 +29,7 @@ func New(key []byte) (*Signer, error) {
 	return &Signer{aead: aead}, nil
 }
 
+// Signer can Sign and Verify Tokens
 type Signer struct {
 	aead cipher.AEAD
 
@@ -36,6 +38,26 @@ type Signer struct {
 	p [hdrSize]byte
 }
 
+// Sign generates a token from the given message and nonce. If the nonce
+// is nil, it is generated automatically using a CSPRNG (crypto/rand.Read).
+//
+// Most implementations will want to call Sign with a nil nonce. The option
+// to pass a nonce is provided for the use-case of regenerating a token
+// determinstically.
+//
+// You should never reuse the same nonce with a different msg or key.
+func (s *Signer) Sign(msg []byte, nonce []byte) (t Token, err error) {
+	if nonce == nil {
+		if nonce, err = mknonce(); err != nil {
+			return nil, err
+		}
+	}
+	return s.sign(msg, nonce), nil
+}
+
+// Verify verifies and decrypts the token contents, returning the
+// decrypted msg if and only if the token is authentic with respect
+// to the Signer's key.
 func (s *Signer) Verify(c Token) (msg []byte, err error) {
 	if len(c) < hdrSize {
 		return nil, ErrShort
@@ -44,15 +66,6 @@ func (s *Signer) Verify(c Token) (msg []byte, err error) {
 	ae, ad := c[n:], c[:n]
 	nonce := ad[1:]
 	return s.aead.Open(nil, nonce, ae, ad)
-}
-
-func (s *Signer) Sign(msg []byte, nonce []byte) (t Token, err error) {
-	if nonce == nil {
-		if nonce, err = mknonce(); err != nil {
-			return nil, err
-		}
-	}
-	return s.sign(msg, nonce), nil
 }
 
 func mknonce() ([]byte, error) {
