@@ -32,6 +32,8 @@ Below is the Token's wire format:
 	The rest is the output of the AEAD, the ciphertext and 16 byte tag.
 	The ciphertext is the encrypted msg.
 	The tag is a message authentication code (MAC) used to verify the integrity of the header and ciphertext
+
+	Finally, the vertical bar denotes the Token's intended string encoding is base64 (url-safe)
 ```
 
 # Interface (caller defined)
