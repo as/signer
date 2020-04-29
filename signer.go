@@ -20,12 +20,6 @@ var (
 	ErrShort  = errors.New("message too short")
 )
 
-func Nonce() ([]byte, error) {
-	p := make([]byte, NonceSize)
-	_, err := rand.Read(p)
-	return p, err
-}
-
 func New(key []byte) (*Signer, error) {
 	aead, err := chacha20poly1305.NewX(key)
 	if err != nil {
@@ -54,11 +48,17 @@ func (s *Signer) Verify(c Token) (msg []byte, err error) {
 
 func (s *Signer) Sign(msg []byte, nonce []byte) (t Token, err error) {
 	if nonce == nil {
-		if nonce, err = Nonce(); err != nil {
+		if nonce, err = mknonce(); err != nil {
 			return nil, err
 		}
 	}
 	return s.sign(msg, nonce), nil
+}
+
+func mknonce() ([]byte, error) {
+	p := make([]byte, NonceSize)
+	_, err := rand.Read(p)
+	return p, err
 }
 
 func (s Signer) sign(msg []byte, nonce []byte) []byte {
