@@ -62,7 +62,7 @@ type Signer interface{
 # Notes
 
 ## Why not use branca?
-Branca has a 32-bit unsigned binary time field and isn't future-proof. Having time in the specification is a scope creep. You can add your own time field in the message and have full control over how to use it.
+Branca has a 32-bit unsigned binary time field and isn't future-proof. Having time in the specification is a scope creep. You can add your own time field in the message and have full control over how to use it. Most branca implementations don't return the message if the message is authentic, but expired. This is rather useless in practical deployments! We want the ability to log authentic but expired tokens to debug misbehaving clients or bugs in clients software.
 
 Branca uses base62. There are many opinions of what base62 actually is (branca test vectors could not be decoded by online base62 decoders.). We prefer a standard encoding in a binary power of 2 that is easily accessible across languages).
 
