@@ -12,7 +12,7 @@ Token is just a byte slice that implements MarshalText and UnmarshalText in base
 
 	The first 24 bytes are the header, authenticated by the AEAD, but not encrypted.
 	The version is fixed to 0x41 (A)
-	The nonce is a randomly-generate 24-byte string
+	The nonce is a randomly-generated 24-byte string
 	The rest is the output of the AEAD, the ciphertext and 16 byte tag. 
 ```
 
