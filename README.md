@@ -37,7 +37,7 @@ Below is the Token's wire format:
 ```
 
 # Interface (caller defined)
-```
+```go
 type Signer interface{
 	// Sign creates a token using the msg and nonce, if nonce is nil
 	// one is generated automatically using a CSPRNG (crypto/rand.Read)
@@ -49,7 +49,7 @@ type Signer interface{
 ```
 
 # Usage Snippet
-```
+```go
 	// Configure
 	key := [32]byte{ /* random data */ }
 	s, _ := signer.New(key[:])
