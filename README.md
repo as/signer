@@ -12,7 +12,8 @@ You have a server that wants to give clients a token. The server need to be able
 that the token it issued came from the server (via the same key) and that this token was
 not modified by the client or some other party. The server also wants to keep the information
 inside the token private, and only accessible by the server or other parties in possession of
-the key. Only the server can verify the authenticity of the key (the authentication is symmetric)
+the key. The authentication is symmetric. Only servers in possesion of the key can verify the
+token's authenticity.
 
 You should not use this if you want the client to be able to read and authenticate the data stored
 in the token. E.G., asymmetric authentication with RSA or an elliptic curve. This token is for
