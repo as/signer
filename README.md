@@ -72,9 +72,11 @@ type Signer interface{
 # Notes
 
 ## Why not use branca?
-Branca's uint32 time field isn't future-proof and ignorant of time predating 1970 (time is a signed value). Time in a token specification is scope creep. Add your own time in the msg to excersize full control, since its guaranteed to be authenitc. 
+Branca's uint32 time field isn't future-proof and ignorant of time predating 1970 (time is a signed value). Time in a token specification is scope creep. Add your own time in the msg to excersize full control, since its guaranteed to be authenitc.  
 
-Branca implementations don't return msg if it is authentic but expired, which is useless for practical deployments. With Signer, you have the ability to log authentic but expired tokens to debug misbehaving clients or bugs in clients software.
+Branca implementations seen in the wild don't return msg if it is authentic but expired, which is useless for practical deployments. With Signer, you have the ability to log authentic but expired tokens to debug misbehaving clients or bugs in clients software.
+
+Branca utilizes a binary time field, one advantage of having a time field would be visibility in your server logs. For example, if logs contained a unix timestamp as part of the branca header, you could easily see in Splunk whether a certain timestamp was expired (assuming it wasn't modified by an adversary). However, Branca uses a binary timestamp, so the benefit of having a greppable/searchable value is quickly lost. You must decode the timestamp manually and in the correct big endian byte order before making assumptions about it even if you assume its authentic.
 
 Branca uses base62, which is a clumsy, poorly-defined standard (branca test vectors could not be decoded by online base62 decoders). Prefer a standard encoding in a binary power of 2 that is easily accessible across languages.
 
