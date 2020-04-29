@@ -19,13 +19,18 @@ in the token. E.G., asymmetric authentication with RSA or an elliptic curve. Thi
 servers that issue tokens, perhaps for sessions or other data.
 
 # Wire Format
+
+Below is the Token's wire format:
 ```
 	version[1] nonce[24] ciphertext[...] tag[16] | base64
 
 	The first 1+24 bytes are the header, authenticated by the AEAD, but not encrypted.
 	The version is fixed to 0x41 (A)
 	The nonce is a randomly-generated 24-byte string
-	The rest is the output of the AEAD, the ciphertext and 16 byte tag. 
+
+	The rest is the output of the AEAD, the ciphertext and 16 byte tag.
+	The ciphertext is the encrypted msg.
+	The tag is a message authentication code (MAC) used to verify the integrity of the header and ciphertext
 ```
 
 # Interface (caller defined)
