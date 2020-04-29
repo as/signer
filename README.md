@@ -15,7 +15,7 @@ inside the token private, and only accessible by the server or other parties in 
 the key. The authentication is symmetric. Only servers in possesion of the key can verify the
 token's authenticity.
 
-You should not use Signer the client (not the server) needs to read and/or authenticate the token
+You should not use Signer if the client (not just the server) needs to read and/or authenticate the token
 E.G., asymmetric authentication with RSA or an elliptic curve. This token is for servers that issue
 tokens, perhaps for sessions or other data.
 
