@@ -2,7 +2,7 @@
 
 Signer is a simple token scheme based on xchacha20poly1305 to generate authenticatable *and encrypted* 
 tokens issued to parties. Signer's wire format similar to "branca", except it utilizes url-safe base64
-and omits branca's awkward 32-bit binary time field.
+and omits branca's 32-bit binary time field.
 
 The Token type is a byte slice implementing base64 MarshalText and UnmarshalText.
 
@@ -15,9 +15,12 @@ inside the token private, and only accessible by the server or other parties in 
 the key. The authentication is symmetric. Only servers in possesion of the key can verify the
 token's authenticity.
 
-You should not use this if you want the client to be able to read and authenticate the data stored
-in the token. E.G., asymmetric authentication with RSA or an elliptic curve. This token is for
-servers that issue tokens, perhaps for sessions or other data.
+You should not use Signer if the client (not just the server) needs to read and/or authenticate the token
+E.G., asymmetric authentication with RSA or an elliptic curve. This token is for servers that issue
+tokens, perhaps for sessions or other data.
+
+For example: If you are using JWT with HMAC (and/or encryption), you can replace it with signer. 
+If you are using JWT with RSA/EC, you can not.
 
 # Wire Format
 
@@ -69,9 +72,11 @@ type Signer interface{
 # Notes
 
 ## Why not use branca?
-Branca's uint32 time field isn't future-proof and ignorant of time predating 1970 (time is a signed value). Time in a token specification is scope creep. Add your own time in the msg to excersize full control, since its guaranteed to be authenitc. 
+Branca's uint32 time field isn't future-proof and ignorant of time predating 1970 (time is a signed value). Time in a token specification is scope creep. Add your own time in the msg to excersize full control, since its guaranteed to be authenitc.  
 
-Branca implementations don't return msg if it is authentic but expired, which is useless for practical deployments. With Signer, you have the ability to log authentic but expired tokens to debug misbehaving clients or bugs in clients software.
+Branca implementations seen in the wild don't return msg if it is authentic but expired, which is useless for practical deployments. With Signer, you have the ability to log authentic but expired tokens to debug misbehaving clients or bugs in clients software.
+
+Branca utilizes a binary time field, one advantage of having a time field would be visibility in your server logs. For example, if logs contained a unix timestamp as part of the branca header, you could easily see in Splunk whether a certain timestamp was expired (assuming it wasn't modified by an adversary). However, Branca uses a binary timestamp, so the benefit of having a greppable/searchable value is quickly lost. You must decode the timestamp manually and in the correct big endian byte order before making assumptions about it even if you assume its authentic.
 
 Branca uses base62, which is a clumsy, poorly-defined standard (branca test vectors could not be decoded by online base62 decoders). Prefer a standard encoding in a binary power of 2 that is easily accessible across languages.
 
@@ -87,7 +92,15 @@ JWT spec is complex and bloated. Signer is a bare-bones token that provides auth
 
 You want the client to be able to validate the contents of the token, using the servers public key. Signer does not support this usecase at the time of writing. However, it may be feasible to support this in another version if there is pressing need.
 
-You don't want the contents of the token to be encrypted. Typically, encryption and authentication are erroneously confused for each other. Signer authenticates and encrypts the ciphertext. If you don't want encryption but want authentication, it might be good to consider other schemes (but this is not likely). In the case of tokens, you usually want the ability to verify the token. Keep in mind that a client who has a plaintext authenticated token has no way to verify its integrity unless they use asymmetric encryption such as RSA or Elliptic Curve, but these are orders of magnitude slower that symmetric encryption, so the performance benefit of dropping encryption and using only authentication in your scheme is lost. This might be a good usecase for a third version of signer that puts the entire token's content into the unencrypted part of the AEAD if there is pressing need. At this time, the idea of this usecase is extremely unlikely.
+You don't want the contents of the token to be encrypted. Typically, encryption and authentication are erroneously confused for each other. Signer authenticates and encrypts the ciphertext. If you don't want encryption but want authentication, it might be good to consider other schemes (but this is not likely). In the case of tokens, you usually want the ability to verify the token. Keep in mind that a client who has a plaintext authenticated token has no way to verify its integrity unless they use asymmetric scheme such as RSA or Elliptic Curve, but these are orders of magnitude slower that symmetric encryption, so the performance benefit of dropping encryption and using only authentication in your scheme is lost. This might be a good usecase for a third version of signer that puts the entire token's content into the unencrypted part of the AEAD if there is pressing need. At this time, the idea of this usecase is unlikely.
+
+This particular implementation of Signer allows the user to pass in a nonce. Nonces should be randomly-generated, as they serve to mitigate a class of attacks that can be used to extract functions of the plaintext from the ciphertext when the same nonce is used more than once for a different plaintext input. We assume the user is fluent enough to not do this, as generating a deterministic nonce with different input requires more effort on behalf of the user than calling the Sign method with a nil nonce. However, if you don't trust your users to do this, you may want to implement your own signer type that has a different method signature disallowing a custom nonce input. In practice, this makes it harder for understanding developers to impelement sanity checks by generating and verifying test vectors. In this package, the user can pass in a nonce because there are certain cases where a token needs to be regenerated from the same message and nonce pair determinstically.
+
+# Base64 Encoding
+
+The Token type uses URL-safe base64-encoding without padding characters. Below is the well-known character-set that comprises base64 url-safe encoding:
+
+`ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_`
 
 # Test Vectors
 
